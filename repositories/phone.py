@@ -15,8 +15,7 @@ def create_phone(db: Session, phones: List[str], group_id: int):
             )
 
             db.add(new_phone)
-            db.commit()
-            db.refresh(new_phone)
+        db.commit()
     except IntegrityError as e:
         print(str(e))
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Duplicate phone provided')
@@ -43,3 +42,16 @@ def create_phone_with_name(db: Session, phones: List[PhoneWithNameCreateRequest]
     except Exception as e:
         print(str(e))
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Server error')
+
+
+def delete(db: Session, id: int):
+    phone = db.query(Phone).filter_by(id=id).first()
+
+    if not phone:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Phone with id {id} not found'
+        )
+
+    db.delete(phone)
+    db.commit()

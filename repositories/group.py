@@ -4,10 +4,10 @@ from models.group import Group
 from fastapi import HTTPException, status
 
 
-def create_group(db: Session, request: GroupCreateRequest) -> int:
+def create_group(db: Session, name: str) -> int:
     try:
         group = Group(
-            name=request.name,
+            name=name,
             affiliate_id=61838
         )
 
