@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from models.phone import Phone
 from fastapi import HTTPException, status
 from typing import List
-from schemas.phone import PhoneWithNameCreateRequest
+from api.schemas.phone import PhoneWithNameCreateRequest
 
 
 def create_phone(db: Session, phones: List[str], group_id: int):

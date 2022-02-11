@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import List
-from schemas.phone import PhoneWithNameCreateRequest
+from typing import List, Optional
+from api.schemas.phone import PhoneWithNameCreateRequest
 
 
 class GroupCreateRequest(BaseModel):
@@ -19,16 +19,6 @@ class CreateFromFileRequest(BaseModel):
 
 class CreateGroupResponse(BaseModel):
     result: str
-    group_id: int
-
-
-class CreateGroupByFileResponse(BaseModel):
-    result: str
-    group_id: int
-    invalid: List[str]
-
-
-class CreateNamedGroupByFileResponse(BaseModel):
-    result: str
-    group_id: int
+    group_id: Optional[int]
+    count: int
     invalid: List[str]

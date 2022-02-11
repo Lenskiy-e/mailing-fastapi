@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from schemas.group import GroupCreateRequest, NamedGroupCreateRequest
+from api.schemas.group import NamedGroupCreateRequest
 from models.group import Group
 from fastapi import HTTPException, status
 

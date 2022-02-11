@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from db.database import engine
 from models import group, mailing, phone
-from routes import group as group_routes, phone as phone_routes
+from api.routes import phone as phone_routes, group as group_routes
 
 app = FastAPI()
 
