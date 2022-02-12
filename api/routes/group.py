@@ -5,7 +5,6 @@ from db.database import get_db
 from repositories import group, phone
 from services import phones_parser
 
-
 STATUS_CREATED = 'Crated'
 STATUS_FAILED = 'Failed'
 
@@ -16,8 +15,8 @@ router = APIRouter(
 
 
 @router.post('/', response_model=group_schema.CreateGroupResponse)
-async def create_group(request: group_schema.GroupCreateRequest, db: Session = Depends(get_db)):
-    parsed_phones = await phones_parser.parse_phones(request.phones)
+def create_group(request: group_schema.GroupCreateRequest, db: Session = Depends(get_db)):
+    parsed_phones = phones_parser.parse_phones(request.phones)
     valid_phones = parsed_phones.get('valid')
     valid_phones_count = len(valid_phones)
 
@@ -37,8 +36,8 @@ async def create_group(request: group_schema.GroupCreateRequest, db: Session = D
 
 
 @router.post('/named', response_model=group_schema.CreateGroupResponse)
-async def create_named_group(request: group_schema.NamedGroupCreateRequest, db: Session = Depends(get_db)):
-    parsed_phones = await phones_parser.parse_phones_with_names(request.phones)
+def create_named_group(request: group_schema.NamedGroupCreateRequest, db: Session = Depends(get_db)):
+    parsed_phones = phones_parser.parse_phones_with_names(request.phones)
     valid_phones = parsed_phones.get('valid')
     valid_phones_count = len(valid_phones)
 
@@ -58,8 +57,8 @@ async def create_named_group(request: group_schema.NamedGroupCreateRequest, db: 
 
 
 @router.post('/by_file', response_model=group_schema.CreateGroupResponse)
-async def create_from_file(name: str, file: UploadFile, db: Session = Depends(get_db)):
-    phones_list = await phones_parser.parse_phones_file(file.file)
+def create_from_file(name: str, file: UploadFile, db: Session = Depends(get_db)):
+    phones_list = phones_parser.parse_phones_file(file.file)
     valid_phones = phones_list.get('valid')
     valid_phones_count = len(valid_phones)
 
@@ -79,8 +78,8 @@ async def create_from_file(name: str, file: UploadFile, db: Session = Depends(ge
 
 
 @router.post('/named_by_file', response_model=group_schema.CreateGroupResponse)
-async def create_named_from_file(name: str, file: UploadFile, db: Session = Depends(get_db)):
-    phones_list = await phones_parser.parse_phones_with_name(file.file)
+def create_named_from_file(name: str, file: UploadFile, db: Session = Depends(get_db)):
+    phones_list = phones_parser.parse_phones_with_name(file.file)
     valid_phones = phones_list.get('valid')
     valid_phones_count = len(valid_phones)
 

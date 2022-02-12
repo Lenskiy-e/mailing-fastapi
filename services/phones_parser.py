@@ -5,7 +5,7 @@ from typing import List
 from api.schemas.phone import PhoneWithNameCreateRequest
 
 
-async def parse_phones(phones: List[str]) -> dict:
+def parse_phones(phones: List[str]) -> dict:
     valid_phones = {}
     invalid_phones = []
 
@@ -27,7 +27,7 @@ async def parse_phones(phones: List[str]) -> dict:
     }
 
 
-async def parse_phones_with_names(phones: List[PhoneWithNameCreateRequest]) -> dict:
+def parse_phones_with_names(phones: List[PhoneWithNameCreateRequest]) -> dict:
     valid_phones = {}
     invalid_phones = []
 
@@ -53,13 +53,13 @@ async def parse_phones_with_names(phones: List[PhoneWithNameCreateRequest]) -> d
     }
 
 
-async def parse_phones_file(file: SpooledTemporaryFile) -> dict:
+def parse_phones_file(file: SpooledTemporaryFile) -> dict:
     phones_list = file.read().decode().split('\n')
 
-    return await parse_phones(phones_list)
+    return parse_phones(phones_list)
 
 
-async def parse_phones_with_name(file: SpooledTemporaryFile) -> dict:
+def parse_phones_with_name(file: SpooledTemporaryFile) -> dict:
     phones_list = file.read().decode().split('\n')
 
     valid_phones = {}
