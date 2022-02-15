@@ -4,6 +4,8 @@ from typing import List
 
 from api.schemas.phone import PhoneWithNameCreateRequest
 
+COUNTRY_PHONE_CODE = '380'
+
 
 def parse_phones(phones: List[str]) -> dict:
     valid_phones = {}
@@ -17,7 +19,7 @@ def parse_phones(phones: List[str]) -> dict:
             continue
 
         if phone_is_valid(phone_number):
-            valid_phones[phone_number] = phone_number
+            valid_phones[phone_number] = COUNTRY_PHONE_CODE + phone_number
         else:
             invalid_phones.append(phone_number + ' (invalid)')
 
@@ -42,7 +44,7 @@ def parse_phones_with_names(phones: List[PhoneWithNameCreateRequest]) -> dict:
         if name_is_valid(name) and phone_is_valid(phone_number):
             valid_phones[phone_number] = PhoneWithNameCreateRequest(
                 name=name,
-                phone=phone_number
+                phone=COUNTRY_PHONE_CODE + phone_number
             )
         else:
             invalid_phones.append(f'{phone_number},{name} (invalid)')
@@ -82,7 +84,7 @@ def parse_phones_with_name(file: SpooledTemporaryFile) -> dict:
         if name_is_valid(name) and phone_is_valid(phone):
             valid_phones[phone] = PhoneWithNameCreateRequest(
                 name=name,
-                phone=phone
+                phone=COUNTRY_PHONE_CODE + phone
             )
         else:
             invalid_phones.append(item + ' (invalid)')

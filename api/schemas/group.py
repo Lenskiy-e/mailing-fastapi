@@ -1,6 +1,8 @@
+import datetime
 from pydantic import BaseModel
 from typing import List, Optional
-from api.schemas.phone import PhoneWithNameCreateRequest
+from api.schemas.phone import PhoneWithNameCreateRequest, PhoneResponse
+from models.group import GroupStatus
 
 
 class GroupCreateRequest(BaseModel):
@@ -22,3 +24,17 @@ class CreateGroupResponse(BaseModel):
     group_id: Optional[int]
     count: int
     invalid: List[str]
+
+
+class GetGroupResponse(BaseModel):
+    id: int
+    name: str
+    description: Optional[str]
+    is_named: bool
+    is_funnel: bool
+    status: GroupStatus
+    cdate: datetime.datetime
+    phones: List[PhoneResponse]
+
+    class Config:
+        orm_mode = True
