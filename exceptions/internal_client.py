@@ -1,5 +1,5 @@
 from fastapi.responses import JSONResponse
-from fastapi import Request
+from fastapi import Request, status
 
 
 class FailedRequestException(Exception):
@@ -12,7 +12,7 @@ class UnauthorizedException(Exception):
 
 def failed_request_exception_handler(request: Request, exception: FailedRequestException):
     return JSONResponse(
-        status_code=500,
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             'error': 'Auth request failed'
         }
@@ -21,7 +21,7 @@ def failed_request_exception_handler(request: Request, exception: FailedRequestE
 
 def unauthorized_exception_handler(request: Request, exception: FailedRequestException):
     return JSONResponse(
-        status_code=401,
+        status_code=status.HTTP_401_UNAUTHORIZED,
         content={
             'error': 'Auth failed'
         }

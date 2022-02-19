@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from api.schemas.group import NamedGroupCreateRequest
 from models.group import Group
 from fastapi import HTTPException, status
+from repositories import phone as phone_repository
 
 
 def create_group(db: Session, name: str, affiliate_id: int) -> int:
@@ -42,28 +43,32 @@ def get_groups(affiliate_id: int, db: Session):
 
 
 def get_group_by_id(id: int, db: Session):
-    group = get_group_instance_by_id(id, db)
+    group = get_group_instance_by_id(id, db).first()
 
     if not group:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Group not found')
 
-    return group.first()
+    return group
 
 
 def get_group_instance_by_id(id: int, db: Session):
     return db.query(Group).filter(Group.id == id)
 
 
-def group_has_affiliate(group: Group, affiliate_id: int) -> bool:
-    return group.affiliate_id == affiliate_id
-
-
 def group_exists(id: int, affiliate_id: int, db: Session) -> bool:
     return db.query(Group).filter_by(id=id, affiliate_id=affiliate_id).count()
 
 
-def update_name(group: Group, db: Session, name: str):
+def update_name(group: Group, db: Session, name: str) -> None:
     group.update({
         Group.name: name
     })
+    db.commit()
+
+
+def delete(group: Group, db: Session) -> None:
+    for phone in group.phones:
+        phone_repository.delete(phone, db)
+
+    db.delete(group)
     db.commit()

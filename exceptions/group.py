@@ -1,4 +1,4 @@
-from fastapi import Request
+from fastapi import Request, status
 from fastapi.responses import JSONResponse
 
 
@@ -15,7 +15,7 @@ class GroupIsNotNamed(Exception):
 
 def group_belongs_to_affiliate_exception_handler(request: Request, exception: GroupBelongsToAffiliateException):
     return JSONResponse(
-        status_code=403,
+        status_code=status.HTTP_403_FORBIDDEN,
         content={
             'error': f'Group {exception.group} doesn\'t belongs to affiliate {exception.affiliate}'
         }
@@ -24,7 +24,7 @@ def group_belongs_to_affiliate_exception_handler(request: Request, exception: Gr
 
 def group_is_not_named_exception_handler(request: Request, exception: GroupIsNotNamed):
     return JSONResponse(
-        status_code=400,
+        status_code=status.HTTP_400_BAD_REQUEST,
         content={
             'error': f'Group {exception.group} is not named'
         }

@@ -44,7 +44,7 @@ def create_phone_with_name(db: Session, phones: List[PhonesWithName], group_id: 
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Server error')
 
 
-def delete(db: Session, id: int):
+def get_by_id(id: int, db: Session) -> Phone:
     phone = db.query(Phone).filter_by(id=id).first()
 
     if not phone:
@@ -53,5 +53,9 @@ def delete(db: Session, id: int):
             detail=f'Phone with id {id} not found'
         )
 
+    return phone
+
+
+def delete(phone: Phone, db: Session):
     db.delete(phone)
     db.commit()

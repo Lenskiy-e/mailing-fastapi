@@ -2,7 +2,11 @@ from fastapi import FastAPI
 from db.database import engine
 from models import group, mailing
 from api.routes import phone as phone_routes, group as group_routes
-from exceptions import internal_client as internal_client_exceptions, group as group_exceptions
+from exceptions import \
+    internal_client as internal_client_exceptions, \
+    group as group_exceptions, \
+    security as security_exceptions
+
 
 app = FastAPI()
 
@@ -31,4 +35,9 @@ app.add_exception_handler(
 app.add_exception_handler(
     group_exceptions.GroupIsNotNamed,
     group_exceptions.group_is_not_named_exception_handler
+)
+
+app.add_exception_handler(
+    security_exceptions.AuthKeyHeaderNotFound,
+    security_exceptions.auth_key_header_not_found_exception_handler
 )
