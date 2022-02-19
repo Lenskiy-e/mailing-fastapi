@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from models.group import Phone
 from fastapi import HTTPException, status
 from typing import List
-from api.schemas.phone import PhoneWithNameCreateRequest
+from api.schemas.phone import PhonesWithName
 
 
 def create_phone(db: Session, phones: List[str], group_id: int):
@@ -24,7 +24,7 @@ def create_phone(db: Session, phones: List[str], group_id: int):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Server error')
 
 
-def create_phone_with_name(db: Session, phones: List[PhoneWithNameCreateRequest], group_id: int):
+def create_phone_with_name(db: Session, phones: List[PhonesWithName], group_id: int):
     try:
         for phone in phones:
             new_phone = Phone(

@@ -24,6 +24,9 @@ class Group(Base):
     mdate = Column(DateTime(timezone=True), onupdate=func.now())
     phones = relationship("Phone")
 
+    def has_affiliate(self, affiliate_id: int) -> bool:
+        return self.affiliate_id == affiliate_id
+
 
 class Phone(Base):
     __tablename__ = 'phones'

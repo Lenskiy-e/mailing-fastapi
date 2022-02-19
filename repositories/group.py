@@ -41,10 +41,29 @@ def get_groups(affiliate_id: int, db: Session):
     return db.query(Group).filter(Group.affiliate_id == affiliate_id).all()
 
 
-def get_group_by_id(id: int, affiliate_id: int, db: Session):
-    group = db.query(Group).filter_by(id=id, affiliate_id=affiliate_id).first()
+def get_group_by_id(id: int, db: Session):
+    group = get_group_instance_by_id(id, db)
 
     if not group:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Groups not found')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Group not found')
 
-    return group
+    return group.first()
+
+
+def get_group_instance_by_id(id: int, db: Session):
+    return db.query(Group).filter(Group.id == id)
+
+
+def group_has_affiliate(group: Group, affiliate_id: int) -> bool:
+    return group.affiliate_id == affiliate_id
+
+
+def group_exists(id: int, affiliate_id: int, db: Session) -> bool:
+    return db.query(Group).filter_by(id=id, affiliate_id=affiliate_id).count()
+
+
+def update_name(group: Group, db: Session, name: str):
+    group.update({
+        Group.name: name
+    })
+    db.commit()

@@ -1,9 +1,9 @@
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
-class PhoneWithNameCreateRequest(BaseModel):
+class PhonesWithName(BaseModel):
     name: str
     phone: str
 
@@ -18,3 +18,12 @@ class PhoneResponse(BaseModel):
     class Config:
         orm_mode = True
 
+
+class ParsedPhonesResponse(BaseModel):
+    valid: List[int]
+    invalid: Optional[List[str]]
+
+
+class ParsedNamedPhonesResponse(BaseModel):
+    valid: List[PhonesWithName]
+    invalid: Optional[List[str]]

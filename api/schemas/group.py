@@ -1,7 +1,7 @@
 import datetime
 from pydantic import BaseModel
 from typing import List, Optional
-from api.schemas.phone import PhoneWithNameCreateRequest, PhoneResponse
+from api.schemas.phone import PhonesWithName, PhoneResponse
 from models.group import GroupStatus
 
 
@@ -12,7 +12,7 @@ class GroupCreateRequest(BaseModel):
 
 class NamedGroupCreateRequest(BaseModel):
     name: str
-    phones: List[PhoneWithNameCreateRequest]
+    phones: List[PhonesWithName]
 
 
 class CreateFromFileRequest(BaseModel):

@@ -2,9 +2,9 @@ from tempfile import SpooledTemporaryFile
 import re
 from typing import List
 
-from api.schemas.phone import PhoneWithNameCreateRequest
+from api.schemas.phone import PhonesWithName
 
-COUNTRY_PHONE_CODE = '380'
+COUNTRY_PHONE_CODE = '38'
 
 
 def parse_phones(phones: List[str]) -> dict:
@@ -24,12 +24,12 @@ def parse_phones(phones: List[str]) -> dict:
             invalid_phones.append(phone_number + ' (invalid)')
 
     return {
-        'valid': valid_phones.values(),
-        'invalid': invalid_phones
+        'valid': list(valid_phones.values()),
+        'invalid': list(invalid_phones)
     }
 
 
-def parse_phones_with_names(phones: List[PhoneWithNameCreateRequest]) -> dict:
+def parse_phones_with_names(phones: List[PhonesWithName]) -> dict:
     valid_phones = {}
     invalid_phones = []
 
@@ -42,7 +42,7 @@ def parse_phones_with_names(phones: List[PhoneWithNameCreateRequest]) -> dict:
             continue
 
         if name_is_valid(name) and phone_is_valid(phone_number):
-            valid_phones[phone_number] = PhoneWithNameCreateRequest(
+            valid_phones[phone_number] = PhonesWithName(
                 name=name,
                 phone=COUNTRY_PHONE_CODE + phone_number
             )
@@ -61,7 +61,7 @@ def parse_phones_file(file: SpooledTemporaryFile) -> dict:
     return parse_phones(phones_list)
 
 
-def parse_phones_with_name(file: SpooledTemporaryFile) -> dict:
+def parse_phones_with_name_file(file: SpooledTemporaryFile) -> dict:
     phones_list = file.read().decode().split('\n')
 
     valid_phones = {}
@@ -82,7 +82,7 @@ def parse_phones_with_name(file: SpooledTemporaryFile) -> dict:
             continue
 
         if name_is_valid(name) and phone_is_valid(phone):
-            valid_phones[phone] = PhoneWithNameCreateRequest(
+            valid_phones[phone] = PhonesWithName(
                 name=name,
                 phone=COUNTRY_PHONE_CODE + phone
             )
@@ -90,8 +90,8 @@ def parse_phones_with_name(file: SpooledTemporaryFile) -> dict:
             invalid_phones.append(item + ' (invalid)')
 
     return {
-        'valid': valid_phones.values(),
-        'invalid': invalid_phones
+        'valid': list(valid_phones.values()),
+        'invalid': list(invalid_phones)
     }
 
 
