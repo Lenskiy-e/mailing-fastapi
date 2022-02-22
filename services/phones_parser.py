@@ -7,7 +7,7 @@ from api.schemas.phone import PhonesWithName
 COUNTRY_PHONE_CODE = '38'
 
 
-def parse_phones(phones: List[str]) -> dict:
+async def parse_phones(phones: List[str]) -> dict:
     valid_phones = {}
     invalid_phones = []
 
@@ -29,7 +29,7 @@ def parse_phones(phones: List[str]) -> dict:
     }
 
 
-def parse_phones_with_names(phones: List[PhonesWithName]) -> dict:
+async def parse_phones_with_names(phones: List[PhonesWithName]) -> dict:
     valid_phones = {}
     invalid_phones = []
 
@@ -55,13 +55,13 @@ def parse_phones_with_names(phones: List[PhonesWithName]) -> dict:
     }
 
 
-def parse_phones_file(file: SpooledTemporaryFile) -> dict:
+async def parse_phones_file(file: SpooledTemporaryFile) -> dict:
     phones_list = file.read().decode().split('\n')
 
-    return parse_phones(phones_list)
+    return await parse_phones(phones_list)
 
 
-def parse_phones_with_name_file(file: SpooledTemporaryFile) -> dict:
+async def parse_phones_with_name_file(file: SpooledTemporaryFile) -> dict:
     phones_list = file.read().decode().split('\n')
 
     valid_phones = {}

@@ -27,12 +27,12 @@ def get_affiliate_id(auth_key: Optional[str] = Header(None)):
 
 
 @router.get('/get', response_model=List[group_schema.GetGroupResponse])
-def get_groups(affiliate_id: int = Depends(get_affiliate_id), db: Session = Depends(get_db)):
+async def get_groups(affiliate_id: int = Depends(get_affiliate_id), db: Session = Depends(get_db)):
     return group_repository.get_groups(affiliate_id, db)
 
 
 @router.get('/{id}', response_model=group_schema.GetGroupResponse)
-def get_group_by_id(id: int, db: Session = Depends(get_db), affiliate_id: int = Depends(get_affiliate_id)):
+async def get_group_by_id(id: int, db: Session = Depends(get_db), affiliate_id: int = Depends(get_affiliate_id)):
     group = group_repository.get_group_by_id(id, db)
 
     if not group.has_affiliate(affiliate_id):
@@ -42,12 +42,12 @@ def get_group_by_id(id: int, db: Session = Depends(get_db), affiliate_id: int = 
 
 
 @router.post('/', response_model=group_schema.CreateGroupResponse)
-def create_group(
+async def create_group(
         request: group_schema.GroupCreateRequest,
         db: Session = Depends(get_db),
         affiliate_id: int = Depends(get_affiliate_id)
 ):
-    parsed_phones = phones_parser.parse_phones(request.phones)
+    parsed_phones = await phones_parser.parse_phones(request.phones)
     valid_phones = parsed_phones.get('valid')
     valid_phones_count = len(valid_phones)
 
@@ -67,12 +67,12 @@ def create_group(
 
 
 @router.post('/named', response_model=group_schema.CreateGroupResponse)
-def create_named_group(
+async def create_named_group(
         request: group_schema.NamedGroupCreateRequest,
         db: Session = Depends(get_db),
         affiliate_id: int = Depends(get_affiliate_id)
 ):
-    parsed_phones = phones_parser.parse_phones_with_names(request.phones)
+    parsed_phones = await phones_parser.parse_phones_with_names(request.phones)
     valid_phones = parsed_phones.get('valid')
     valid_phones_count = len(valid_phones)
 
@@ -92,17 +92,17 @@ def create_named_group(
 
 
 @router.patch('/{id}', response_model=group_schema.CreateGroupResponse)
-def update_group(
+async def update_group(
         group_id: int,
         request: group_schema.GroupCreateRequest,
         db: Session = Depends(get_db),
         affiliate_id: int = Depends(get_affiliate_id)
 ):
-    parsed_phones = phones_parser.parse_phones(request.phones)
+    parsed_phones = await phones_parser.parse_phones(request.phones)
     valid_phones = parsed_phones.get('valid')
     valid_phones_count = len(valid_phones)
     group = group_repository.get_group_instance_by_id(group_id, db)
-    update_group_name(group, affiliate_id, request.name, db).first()
+    await update_group_name(group, affiliate_id, request.name, db)
 
     response = group_schema.CreateGroupResponse(
         count=valid_phones_count,
@@ -118,13 +118,13 @@ def update_group(
 
 
 @router.patch('/{id}/named', response_model=group_schema.CreateGroupResponse)
-def update_named_group(
+async def update_named_group(
         group_id: int,
         request: group_schema.NamedGroupCreateRequest,
         db: Session = Depends(get_db),
         affiliate_id: int = Depends(get_affiliate_id)
 ):
-    parsed_phones = phones_parser.parse_phones_with_names(request.phones)
+    parsed_phones = await phones_parser.parse_phones_with_names(request.phones)
     valid_phones = parsed_phones.get('valid')
     valid_phones_count = len(valid_phones)
     group = group_repository.get_group_instance_by_id(group_id, db)
@@ -138,7 +138,7 @@ def update_named_group(
         result=STATUS_UPDATED
     )
 
-    update_group_name(group, affiliate_id, request.name, db)
+    await update_group_name(group, affiliate_id, request.name, db)
     if valid_phones_count:
         phone.create_phone_with_name(db, valid_phones, group_id)
         response.group_id = group_id
@@ -147,13 +147,13 @@ def update_named_group(
 
 
 @router.post('/parse_file', response_model=phone_schema.ParsedPhonesResponse)
-def parse_from_file(file: UploadFile):
-    return phones_parser.parse_phones_file(file.file)
+async def parse_from_file(file: UploadFile):
+    return await phones_parser.parse_phones_file(file.file)
 
 
 @router.post('/parse_named_file', response_model=phone_schema.ParsedNamedPhonesResponse)
-def parse_from_named_file(file: UploadFile):
-    return phones_parser.parse_phones_with_name_file(file.file)
+async def parse_from_named_file(file: UploadFile):
+    return await phones_parser.parse_phones_with_name_file(file.file)
 
 
 @router.delete('/{id}')
@@ -170,10 +170,8 @@ def delete_group(group_id: int, db: Session = Depends(get_db), affiliate_id: int
     }
 
 
-def update_group_name(group: group_model, affiliate_id: int, name: str, db: Session) -> group_model:
+async def update_group_name(group: group_model, affiliate_id: int, name: str, db: Session) -> None:
     if not group.first().has_affiliate(affiliate_id):
         raise group_exceptions.GroupBelongsToAffiliateException(group.id, affiliate_id)
 
     group_repository.update_name(group, db, name)
-
-    return group
