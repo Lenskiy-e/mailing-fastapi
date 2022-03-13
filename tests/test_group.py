@@ -11,10 +11,35 @@ headers = {
 }
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_groups_get(api_client):
+    new_groups = [
+        {
+            "name": "from pytest 1",
+            "phones": [
+                "0999999911",
+                "0999999912",
+            ]
+        },
+        {
+            "name": "from pytest 2",
+            "phones": [
+                "0999999913",
+                "0999999914",
+            ]
+        }
+    ]
+
+    for group in new_groups:
+        await create_group(api_client, group)
+
     response = await api_client.get("/group/", headers=headers)
+    result = response.json()
+
     assert response.status_code == 200
+    assert len(result) == 2
+    assert result[0].get('name') == new_groups[0].get('name')
+    assert result[1].get('name') == new_groups[1].get('name')
 
 
 @pytest.mark.asyncio
