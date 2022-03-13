@@ -9,7 +9,7 @@ from services import phones_parser, internal_client
 from models.group import Group as group_model
 from exceptions import group as group_exceptions, security as security_exceptions
 
-STATUS_CREATED = 'Crated'
+STATUS_CREATED = 'Created'
 STATUS_FAILED = 'Failed'
 STATUS_UPDATED = 'Updated'
 
@@ -23,7 +23,7 @@ def get_affiliate_id(auth_key: Optional[str] = Header(None)):
     if not auth_key:
         raise security_exceptions.AuthKeyHeaderNotFound()
 
-    return asyncio.run(internal_client.auth(auth_key))[0]  #o1EzzzurPdJMwSQtVYzD8iar
+    return asyncio.run(internal_client.auth(auth_key))[0]
 
 
 @router.get('/', response_model=List[group_schema.GetGroupResponse])
@@ -41,7 +41,7 @@ async def get_group_by_id(id: int, db: Session = Depends(get_db), affiliate_id: 
     return group
 
 
-@router.post('/', response_model=group_schema.CreateGroupResponse)
+@router.post('/', response_model=group_schema.CreateGroupResponse, status_code=201)
 async def create_group(
         request: group_schema.GroupCreateRequest,
         db: Session = Depends(get_db),
@@ -66,7 +66,7 @@ async def create_group(
     return response
 
 
-@router.post('/named', response_model=group_schema.CreateGroupResponse)
+@router.post('/named', response_model=group_schema.CreateGroupResponse, status_code=201)
 async def create_named_group(
         request: group_schema.NamedGroupCreateRequest,
         db: Session = Depends(get_db),
