@@ -1,4 +1,5 @@
 from pydantic import BaseSettings
+import os
 
 
 class Settings(BaseSettings):
@@ -9,7 +10,7 @@ class Settings(BaseSettings):
     country_phone_code: str
 
     class Config:
-        env_file = ".env"
+        env_file = os.getenv('ENV_FILE')
 
 
 settings = Settings()
