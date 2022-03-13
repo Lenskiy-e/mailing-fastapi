@@ -2,15 +2,15 @@ import asyncio
 import aiohttp
 from aiohttp import ClientSession
 from exceptions.internal_client import FailedRequestException, UnauthorizedException
+from config import settings
 
-api_url = 'http://api.internal.develop2.salesdoubler.net/affiliates/info/by/token/'
-api_token = 'YnVvZHNlbGFzQHpz'
+api_url = f'{settings.internal_api_url}/affiliates/info/by/token/'
 
 
 async def auth(token: str):
     headers = {
-        'Auth-Role': 'Employee',
-        'Access-Token': api_token
+        'Auth-Role': settings.internal_api_role,
+        'Access-Token': settings.internal_api_token
     }
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False), headers=headers) as session:
         response = asyncio.create_task(send_request(token, session))

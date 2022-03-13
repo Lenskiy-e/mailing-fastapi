@@ -1,10 +1,11 @@
 from tempfile import SpooledTemporaryFile
 import re
 from typing import List
+from config import settings
 
 from api.schemas.phone import PhonesWithName
 
-COUNTRY_PHONE_CODE = '38'
+COUNTRY_PHONE_CODE = settings.country_phone_code
 
 
 async def parse_phones(phones: List[str]) -> dict:

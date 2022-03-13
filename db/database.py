@@ -1,8 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from config import settings
 
-DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/python-mailing'
+
+DATABASE_URL = settings.app_db_url
 
 engine = create_engine(DATABASE_URL)
 
