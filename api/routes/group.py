@@ -26,7 +26,7 @@ def get_affiliate_id(auth_key: Optional[str] = Header(None)):
     return asyncio.run(internal_client.auth(auth_key))[0]  #o1EzzzurPdJMwSQtVYzD8iar
 
 
-@router.get('/get', response_model=List[group_schema.GetGroupResponse])
+@router.get('/', response_model=List[group_schema.GetGroupResponse])
 async def get_groups(affiliate_id: int = Depends(get_affiliate_id), db: Session = Depends(get_db)):
     return group_repository.get_groups(affiliate_id, db)
 
