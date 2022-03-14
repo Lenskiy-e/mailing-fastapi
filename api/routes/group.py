@@ -58,7 +58,7 @@ async def create_group(
     )
 
     if valid_phones_count:
-        group_id = group_repository.create_group(db, request.name, affiliate_id)
+        group_id = group_repository.create_group(db, request.name, affiliate_id, request.description)
         phone.create_phone(db, valid_phones, group_id)
         response.result = STATUS_CREATED
         response.group_id = group_id
@@ -91,7 +91,7 @@ async def create_named_group(
     return response
 
 
-@router.patch('/{id}', response_model=group_schema.CreateGroupResponse)
+@router.patch('/{group_id}', response_model=group_schema.CreateGroupResponse)
 async def update_group(
         group_id: int,
         request: group_schema.GroupCreateRequest,
@@ -102,7 +102,7 @@ async def update_group(
     valid_phones = parsed_phones.get('valid')
     valid_phones_count = len(valid_phones)
     group = group_repository.get_group_instance_by_id(group_id, db)
-    await update_group_name(group, affiliate_id, request.name, db)
+    await update_group_data(group, affiliate_id, request.name, db, request.description)
 
     response = group_schema.CreateGroupResponse(
         count=valid_phones_count,
@@ -117,7 +117,7 @@ async def update_group(
     return response
 
 
-@router.patch('/{id}/named', response_model=group_schema.CreateGroupResponse)
+@router.patch('/{id}/named', response_model=group_schema.CreateGroupResponse, status_code=201)
 async def update_named_group(
         group_id: int,
         request: group_schema.NamedGroupCreateRequest,
@@ -138,7 +138,7 @@ async def update_named_group(
         result=STATUS_UPDATED
     )
 
-    await update_group_name(group, affiliate_id, request.name, db)
+    await update_group_data(group, affiliate_id, request.name, db, request.description)
     if valid_phones_count:
         phone.create_phone_with_name(db, valid_phones, group_id)
         response.group_id = group_id
@@ -170,8 +170,14 @@ def delete_group(group_id: int, db: Session = Depends(get_db), affiliate_id: int
     }
 
 
-async def update_group_name(group: group_model, affiliate_id: int, name: str, db: Session) -> None:
+async def update_group_data(
+        group: group_model,
+        affiliate_id: int,
+        name: str,
+        db: Session,
+        description: Optional[str] = ''
+) -> None:
     if not group.first().has_affiliate(affiliate_id):
         raise group_exceptions.GroupBelongsToAffiliateException(group.id, affiliate_id)
 
-    group_repository.update_name(group, db, name)
+    group_repository.update_data(group, db, name, description)

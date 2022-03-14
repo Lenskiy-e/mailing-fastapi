@@ -7,11 +7,13 @@ from models.group import GroupStatus
 
 class GroupCreateRequest(BaseModel):
     name: str
+    description: Optional[str]
     phones: List[str]
 
 
 class NamedGroupCreateRequest(BaseModel):
     name: str
+    description: Optional[str]
     phones: List[PhonesWithName]
 
 
