@@ -8,13 +8,13 @@ from models.group import GroupStatus
 class GroupCreateRequest(BaseModel):
     name: str
     description: Optional[str]
-    phones: List[str]
+    phones: Optional[List[str]]
 
 
 class NamedGroupCreateRequest(BaseModel):
     name: str
     description: Optional[str]
-    phones: List[PhonesWithName]
+    phones: Optional[List[PhonesWithName]]
 
 
 class CreateFromFileRequest(BaseModel):

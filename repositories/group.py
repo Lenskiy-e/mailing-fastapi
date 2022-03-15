@@ -29,7 +29,8 @@ def create_named_group(db: Session, request: NamedGroupCreateRequest, affiliate_
         group = Group(
             name=request.name,
             affiliate_id=affiliate_id,
-            is_named=True
+            is_named=True,
+            description=request.description
         )
 
         db.add(group)
@@ -55,7 +56,12 @@ def get_group_by_id(id: int, db: Session):
 
 
 def get_group_instance_by_id(id: int, db: Session):
-    return db.query(Group).filter(Group.id == id)
+    group = db.query(Group).filter(Group.id == id)
+
+    if not group.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Group not found')
+
+    return group
 
 
 def group_exists(id: int, affiliate_id: int, db: Session) -> bool:

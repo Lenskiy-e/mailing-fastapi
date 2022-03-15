@@ -117,7 +117,7 @@ async def update_group(
     return response
 
 
-@router.patch('/{id}/named', response_model=group_schema.CreateGroupResponse, status_code=201)
+@router.patch('/{group_id}/named', response_model=group_schema.CreateGroupResponse)
 async def update_named_group(
         group_id: int,
         request: group_schema.NamedGroupCreateRequest,
@@ -156,7 +156,7 @@ async def parse_from_named_file(file: UploadFile):
     return await phones_parser.parse_phones_with_name_file(file.file)
 
 
-@router.delete('/{id}')
+@router.delete('/{group_id}')
 def delete_group(group_id: int, db: Session = Depends(get_db), affiliate_id: int = Depends(get_affiliate_id)):
     group = group_repository.get_group_by_id(group_id, db)
 
