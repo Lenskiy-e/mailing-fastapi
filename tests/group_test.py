@@ -1,8 +1,5 @@
 import pytest
-from .fixtures.databese import setup_db
-from .fixtures.client import api_client
-from .fixtures.eventloop import event_loop
-from .fixtures.conftest import anyio_backend
+from .fixtures import *
 from models.group import Group
 from models.group import Phone
 from config import settings
@@ -45,7 +42,7 @@ async def test_groups_get(api_client):
 
 
 @pytest.mark.asyncio
-async def test_group_create(api_client, setup_db):
+async def test_group_create(api_client, get_connection):
     valid_phone = "0999999915"
     invalid_phone = "9999999999"
     new_group = {
@@ -58,8 +55,8 @@ async def test_group_create(api_client, setup_db):
     }
     response = await create_group(api_client, new_group)
     result = response.json()
-    group = setup_db.query(Group).filter(Group.name == new_group.get('name')).first()
-    phone = setup_db.query(Phone).filter(Phone.phone == f'38{valid_phone}').first()
+    group = get_connection.query(Group).filter(Group.name == new_group.get('name')).first()
+    phone = get_connection.query(Phone).filter(Phone.phone == f'38{valid_phone}').first()
 
     assert response.status_code == 201
     assert result.get('count') == 1
@@ -70,7 +67,7 @@ async def test_group_create(api_client, setup_db):
 
 
 @pytest.mark.asyncio
-async def test_group_get_by_id(api_client, setup_db):
+async def test_group_get_by_id(api_client, get_connection):
     new_phone = "0999999916"
     new_group = {
         "name": "from pytest 4",
@@ -96,7 +93,7 @@ async def test_group_get_by_id(api_client, setup_db):
 
 
 @pytest.mark.asyncio
-async def test_create_named_group(api_client, setup_db):
+async def test_create_named_group(api_client, get_connection):
     valid_phone = {
         "name": "valid name",
         "phone": "0999999917"
@@ -123,8 +120,8 @@ async def test_create_named_group(api_client, setup_db):
 
     response = await create_named_group(api_client, new_named_group)
     result = response.json()
-    group = setup_db.query(Group).filter(Group.id == result.get('group_id')).first()
-    phone = setup_db.query(Phone).filter(Phone.group_id == result.get('group_id')).first()
+    group = get_connection.query(Group).filter(Group.id == result.get('group_id')).first()
+    phone = get_connection.query(Phone).filter(Phone.group_id == result.get('group_id')).first()
 
     assert response.status_code == 201
     assert result.get('result') == 'Created'
@@ -141,7 +138,7 @@ async def test_create_named_group(api_client, setup_db):
 
 
 @pytest.mark.asyncio
-async def test_update_group(api_client, setup_db):
+async def test_update_group(api_client, get_connection):
     new_group = {
         "name": "from pytest 5",
         "description": "created from test",
@@ -163,8 +160,8 @@ async def test_update_group(api_client, setup_db):
 
     update_response = await api_client.patch(f'/group/{group_id}', headers=headers, json=updated_group_data)
     update_result = update_response.json()
-    group = setup_db.query(Group).filter(Group.id == result.get('group_id')).first()
-    phones = setup_db.query(Phone).filter(Phone.group_id == result.get('group_id')).all()
+    group = get_connection.query(Group).filter(Group.id == result.get('group_id')).first()
+    phones = get_connection.query(Phone).filter(Phone.group_id == result.get('group_id')).all()
 
     # Checking response
     assert update_response.status_code == 200
@@ -179,7 +176,7 @@ async def test_update_group(api_client, setup_db):
 
 
 @pytest.mark.asyncio
-async def test_update_named_group(api_client, setup_db):
+async def test_update_named_group(api_client, get_connection):
     new_named_group = {
             "name": "from pytest 6",
             "description": "created from test 6",
@@ -215,8 +212,8 @@ async def test_update_named_group(api_client, setup_db):
 
     update_response = await api_client.patch(f'/group/{group_id}/named', headers=headers, json=updated_group_data)
     update_result = update_response.json()
-    group = setup_db.query(Group).filter(Group.id == group_id).first()
-    phones = setup_db.query(Phone).filter(Phone.group_id == group_id).all()
+    group = get_connection.query(Group).filter(Group.id == group_id).first()
+    phones = get_connection.query(Phone).filter(Phone.group_id == group_id).all()
 
     # Checking response
     assert create_response.status_code == 201
@@ -232,7 +229,7 @@ async def test_update_named_group(api_client, setup_db):
 
 
 @pytest.mark.asyncio
-async def test_delete_group(api_client, setup_db):
+async def test_delete_group(api_client, get_connection):
     valid_phone = "0999999923"
     new_group = {
         "name": "from pytest 7",
@@ -247,8 +244,8 @@ async def test_delete_group(api_client, setup_db):
     group_id = created_group_result.get('group_id')
 
     response = await api_client.delete(f'/group/{group_id}', headers=headers)
-    group = setup_db.query(Group).filter(Group.id == group_id).first()
-    phones = setup_db.query(Phone).filter(Phone.group_id == group_id).all()
+    group = get_connection.query(Group).filter(Group.id == group_id).first()
+    phones = get_connection.query(Phone).filter(Phone.group_id == group_id).all()
 
     assert response.status_code == 200
     assert group is None
@@ -285,7 +282,7 @@ async def test_create_named_group_with_invalid_data(api_client):
 
 
 @pytest.mark.asyncio
-async def test_update_group_with_invalid_data(api_client, setup_db):
+async def test_update_group_with_invalid_data(api_client, get_connection):
     new_group = {
         "name": "from pytest 8",
         "description": "created from test",
@@ -305,8 +302,8 @@ async def test_update_group_with_invalid_data(api_client, setup_db):
     group_id = created_response.json().get('group_id')
 
     update_response = await api_client.patch(f'/group/{group_id}', headers=headers, json=update_data)
-    group = setup_db.query(Group).filter(Group.id == group_id).first()
-    phones = setup_db.query(Phone).filter(Phone.group_id == group_id).all()
+    group = get_connection.query(Group).filter(Group.id == group_id).first()
+    phones = get_connection.query(Phone).filter(Phone.group_id == group_id).all()
 
     assert update_response.status_code == 422
     assert group.name == new_group.get('name')
@@ -315,7 +312,7 @@ async def test_update_group_with_invalid_data(api_client, setup_db):
 
 
 @pytest.mark.asyncio
-async def test_update_named_group_with_invalid_data(api_client, setup_db):
+async def test_update_named_group_with_invalid_data(api_client, get_connection):
     new_group = {
         "name": "from pytest 8",
         "description": "created from test",
@@ -341,8 +338,8 @@ async def test_update_named_group_with_invalid_data(api_client, setup_db):
     group_id = created_response.json().get('group_id')
 
     update_response = await api_client.patch(f'/group/{group_id}/named', headers=headers, json=update_data)
-    group = setup_db.query(Group).filter(Group.id == group_id).first()
-    phones = setup_db.query(Phone).filter(Phone.group_id == group_id).all()
+    group = get_connection.query(Group).filter(Group.id == group_id).first()
+    phones = get_connection.query(Phone).filter(Phone.group_id == group_id).all()
 
     assert update_response.status_code == 422
     assert group.name == new_group.get('name')
@@ -359,7 +356,7 @@ async def test_get_undefined_group(api_client):
 
 
 @pytest.mark.asyncio
-async def test_update_undefined_group(api_client, setup_db):
+async def test_update_undefined_group(api_client, get_connection):
     undefined_phone = "0999999930"
     update_data = {
         "name": "undefined group",
@@ -371,8 +368,8 @@ async def test_update_undefined_group(api_client, setup_db):
     group_id = 123123123
 
     response = await api_client.patch(f'/group/{group_id}', headers=headers, json=update_data)
-    group = setup_db.query(Group).filter(Group.id == group_id).first()
-    phone = setup_db.query(Phone).filter(Phone.phone == f'38{undefined_phone}').first()
+    group = get_connection.query(Group).filter(Group.id == group_id).first()
+    phone = get_connection.query(Phone).filter(Phone.phone == f'38{undefined_phone}').first()
 
     assert response.status_code == 404
     assert response.json() == {'detail': 'Group not found'}
@@ -381,7 +378,7 @@ async def test_update_undefined_group(api_client, setup_db):
 
 
 @pytest.mark.asyncio
-async def test_update_undefined_named_group(api_client, setup_db):
+async def test_update_undefined_named_group(api_client, get_connection):
     undefined_phone = {
         "phone": "0999999931",
         "name": "undefined name"
@@ -396,8 +393,8 @@ async def test_update_undefined_named_group(api_client, setup_db):
     group_id = 321321
 
     response = await api_client.patch(f'/group/{group_id}/named', headers=headers, json=update_data)
-    group = setup_db.query(Group).filter(Group.id == group_id).first()
-    phone = setup_db.query(Phone).filter(Phone.phone == f'38{undefined_phone.get("phone")}').first()
+    group = get_connection.query(Group).filter(Group.id == group_id).first()
+    phone = get_connection.query(Phone).filter(Phone.phone == f'38{undefined_phone.get("phone")}').first()
 
     assert response.status_code == 404
     assert response.json() == {'detail': 'Group not found'}
