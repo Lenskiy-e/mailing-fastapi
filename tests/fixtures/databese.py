@@ -8,9 +8,10 @@ def setup_db():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
+    yield
     db.close()
 
 
 @pytest.fixture(scope='function')
 def get_connection():
-    yield next(get_db())
+    return next(get_db())
