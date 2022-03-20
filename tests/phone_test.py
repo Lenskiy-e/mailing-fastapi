@@ -1,7 +1,4 @@
 import pytest
-from .fixtures.client import api_client
-from .fixtures.database import get_connection
-from .fixtures.conftest import anyio_backend
 from config import settings
 from models.group import Phone
 

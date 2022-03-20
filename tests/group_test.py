@@ -1,5 +1,4 @@
 import pytest
-from .fixtures import *
 from models.group import Group
 from models.group import Phone
 from config import settings
@@ -34,6 +33,7 @@ async def test_groups_get(api_client):
 
     response = await api_client.get("/group/", headers=headers)
     result = response.json()
+
 
     assert response.status_code == 200
     assert len(result) == 2
