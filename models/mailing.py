@@ -4,6 +4,7 @@ from sqlalchemy.sql.sqltypes import Integer, String, Text, DateTime, Enum, Float
 from models.group import Group
 from sqlalchemy.sql import func
 from enum import Enum as enum_type
+from exceptions.mailing import InvalidStatusToChange
 
 
 class MailingStatus(str, enum_type):
@@ -12,6 +13,10 @@ class MailingStatus(str, enum_type):
     pending = 'pending'
     rejected = 'rejected'
     waiting = 'waiting'
+    ready_to_send = 'ready to send'
+
+    def get_changeable_statuses(self) -> []:
+        return [self.new, self.ready_to_send]
 
 
 class Mailing(Base):
@@ -30,3 +35,9 @@ class Mailing(Base):
     payout_id = Column(Integer)
     cdate = Column(DateTime(timezone=True), server_default=func.now())
     mdate = Column(DateTime(timezone=True), onupdate=func.now())
+
+    def change_status(self, status: MailingStatus) -> None:
+        if status not in MailingStatus.get_changeable_statuses:
+            raise InvalidStatusToChange(status)
+
+        self.status = status

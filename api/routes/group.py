@@ -1,13 +1,13 @@
-import asyncio
 from typing import Optional, List
-from fastapi import APIRouter, Depends, UploadFile, Header
+from fastapi import APIRouter, Depends, UploadFile
 from api.schemas import group as group_schema, phone as phone_schema
 from sqlalchemy.orm import Session
 from db.database import get_db
 from repositories import group as group_repository, phone
-from services import phones_parser, internal_client
+from services import phones_parser
+from services.internal_client import get_affiliate_id
 from models.group import Group as group_model
-from exceptions import group as group_exceptions, security as security_exceptions
+from exceptions import group as group_exceptions
 
 STATUS_CREATED = 'Created'
 STATUS_FAILED = 'Failed'
@@ -17,13 +17,6 @@ router = APIRouter(
     prefix='/group',
     tags=['group']
 )
-
-
-def get_affiliate_id(auth_key: Optional[str] = Header(None)):
-    if not auth_key:
-        raise security_exceptions.AuthKeyHeaderNotFound()
-
-    return asyncio.run(internal_client.auth(auth_key))[0]
 
 
 @router.get('/', response_model=List[group_schema.GetGroupResponse])

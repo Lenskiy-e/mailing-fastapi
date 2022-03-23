@@ -1,8 +1,8 @@
 from typing import Optional
-
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from api.schemas.group import NamedGroupCreateRequest
-from models.group import Group
+from models.group import Group, Phone
 from fastapi import HTTPException, status
 from repositories import phone as phone_repository
 
@@ -20,7 +20,7 @@ def create_group(db: Session, name: str, affiliate_id: int, description: Optiona
         db.refresh(group)
 
         return group.id
-    except:
+    except SQLAlchemyError:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Server error')
 
 
@@ -38,7 +38,7 @@ def create_named_group(db: Session, request: NamedGroupCreateRequest, affiliate_
         db.refresh(group)
 
         return group.id
-    except:
+    except SQLAlchemyError:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Server error')
 
 
@@ -82,3 +82,7 @@ def delete(group: Group, db: Session) -> None:
 
     db.delete(group)
     db.commit()
+
+
+def get_active_phones(group_id: int, db: Session) -> list:
+    return db.query(Phone).filter_by(group_id=group_id, deleted=False).all()

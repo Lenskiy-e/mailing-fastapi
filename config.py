@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     internal_api_url: str = Field(str, env='INTERNAL_API_URL')
     country_phone_code: str = Field(str, env='COUNTRY_PHONE_CODE')
     internal_auth_key: str = Field(None, env='INTERNAL_AUTH_KEY')
+    sms_cost: float = Field(float, env='SMS_COST')
 
     class Config:
         env_file = f'{os.path.dirname(os.path.abspath(__file__))}/{os.getenv("ENV_FILE")}'

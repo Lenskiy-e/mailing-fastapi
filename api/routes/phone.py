@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
 from repositories import phone as phone_repository, group as group_repository
-from api.routes.group import get_affiliate_id
+from services.internal_client import get_affiliate_id
 from exceptions import group as group_exceptions
 
 router = APIRouter(
